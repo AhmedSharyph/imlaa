@@ -1,0 +1,26 @@
+name: AssemblyAI Transcription
+
+on:
+  push:
+    paths:
+      - 'audio/**'   # Trigger when audio files in /audio change
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run transcription script
+        env:
+          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
+        run: npm run transcribe
