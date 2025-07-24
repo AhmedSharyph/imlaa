@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="dv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divehi Voice to Word</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      direction: rtl;
+      font-size: 1.2rem;
+    }
+    button {
+      margin: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 ޑިވެހި އަސްލު ބަޔާން ވާދަކު</h1>
+  <button id="start">Start Speaking</button>
+  <button id="stop">Stop</button>
+  <button id="download">Download as DOCX</button>
+  <textarea id="output" placeholder="ބަޔާން ހުށަހެއްޓެއް ލިޔުން..."></textarea>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.min.js"></script>
+  <script>
+    const output = document.getElementById('output');
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const downloadBtn = document.getElementById('download');
+
+    let recognition;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'dv-MV'; // Divehi language
+      recognition.interimResults = true;
+      recognition.continuous = true;
+
+      recognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        output.value += transcript;
+      };
+    } else {
+      alert('Speech Recognition is not supported in this browser.');
+    }
+
+    startBtn.onclick = () => recognition && recognition.start();
+    stopBtn.onclick = () => recognition && recognition.stop();
+
+    downloadBtn.onclick = () => {
+      const { Document, Packer, Paragraph } = window.docx;
+      const doc = new Document({
+        sections: [{
+          children: [
+            new Paragraph({
+              text: output.value,
+              bidirectional: true,
+              rightToLeft: true,
+            })
+          ]
+        }]
+      });
+
+      Packer.toBlob(doc).then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Divehi_Transcription.docx';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    };
+  </script>
+</body>
+</html>
