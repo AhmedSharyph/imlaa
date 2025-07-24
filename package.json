@@ -1,0 +1,14 @@
+{
+  "name": "imla",
+  "version": "1.0.0",
+  "description": "Divehi audio transcription using AssemblyAI",
+  "type": "module",
+  "scripts": {
+    "transcribe": "node transcribe.js"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "fs-extra": "^11.1.1"
+  }
+}
